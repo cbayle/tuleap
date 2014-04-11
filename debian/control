@@ -138,6 +138,12 @@ Description: Tuleap plugin to manage LDAP integration
  LDAP Plugin for Tuleap. Provides LDAP information, LDAP
  authentication, user and group management.
 
+Package: tuleap-plugin-mediawiki
+Architecture: all
+Depends: tuleap (= ${source:Version}), mediawiki (>=1.22), ${misc:Depends}
+Description: Mediawiki integration in Tuleap
+ This plugin provides Mediawiki integration in Tuleap.
+
 Package: tuleap-plugin-im
 Architecture: all
 Depends: tuleap (= ${source:Version}), openfire, openfire-tuleap-plugins, ${misc:Depends}, ${perl:Depends}
@@ -194,11 +200,24 @@ Depends: tuleap (= ${source:Version}), elasticsearch, ${misc:Depends}
 Description: Full-Text Search for Tuleap
  Allows documents of the docman to be searched in a full-text manner.
 
+Package: tuleap-plugin-fusionforgecompat
+Section: utils
+Architecture: all
+Depends: tuleap (= ${source:Version}), ${misc:Depends}
+Description: FusionForge plugins compat in Tuleap
+ Allows some fusionforge plugins to be installed in a Tuleap instance.
+
 Package: tuleap-theme-dawn
 Architecture: all
 Depends: tuleap (= ${source:Version}), ${misc:Depends}
 Description: Dawn theme for Tuleap
  This package provides the Dawn theme for Tuleap.
+
+Package: tuleap-theme-experimental
+Architecture: all
+Depends: tuleap (= ${source:Version}), ${misc:Depends}
+Description: Experimental theme for Tuleap
+ This package provides the Experimental theme for Tuleap.
 
 Package: tuleap-theme-savannah
 Architecture: all

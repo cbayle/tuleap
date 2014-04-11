@@ -1,0 +1,3 @@
+var/lib/tuleap/mediawiki
+var/lib/tuleap/mediawiki/master
+var/lib/tuleap/mediawiki/projects
