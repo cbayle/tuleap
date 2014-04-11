@@ -139,6 +139,12 @@ Description: Tuleap plugin to manage LDAP integration
  LDAP Plugin for Tuleap. Provides LDAP information, LDAP
  authentication, user and group management.
 
+Package: tuleap-plugin-mediawiki
+Architecture: all
+Depends: tuleap (= ${source:Version}), mediawiki (>=1.22), ${misc:Depends}
+Description: Mediawiki integration in Tuleap
+ This plugin provides Mediawiki integration in Tuleap.
+
 Package: tuleap-plugin-im
 Architecture: all
 Depends: tuleap (= ${source:Version}), openfire, openfire-tuleap-plugins, ${misc:Depends}, ${perl:Depends}
@@ -258,6 +264,12 @@ Architecture: all
 Depends: tuleap (= ${source:Version}), ${misc:Depends}
 Description: Dawn theme for Tuleap
  This package provides the Dawn theme for Tuleap.
+
+Package: tuleap-theme-experimental
+Architecture: all
+Depends: tuleap (= ${source:Version}), ${misc:Depends}
+Description: Experimental theme for Tuleap
+ This package provides the Experimental theme for Tuleap.
 
 Package: tuleap-theme-savannah
 Architecture: all
