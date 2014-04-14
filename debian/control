@@ -141,7 +141,7 @@ Description: Tuleap plugin to manage LDAP integration
 
 Package: tuleap-plugin-mediawiki
 Architecture: all
-Depends: tuleap (= ${source:Version}), mediawiki (>=1.22), ${misc:Depends}
+Depends: tuleap (= ${source:Version}), mediawiki (>=1:1.22), ${misc:Depends}
 Description: Mediawiki integration in Tuleap
  This plugin provides Mediawiki integration in Tuleap.
 
