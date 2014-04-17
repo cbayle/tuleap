@@ -64,6 +64,8 @@ Depends: ${misc:Depends}, tuleap,
  tuleap-plugin-webdav,
  tuleap-plugin-tracker,
  tuleap-plugin-graphontrackers,
+ tuleap-plugin-mediawiki,
+ tuleap-theme-experimental,
  tuleap-theme-tuleap
 Description: Tuleap meta package with all dependencies
  This package install all Tuleap components to have a large view of
