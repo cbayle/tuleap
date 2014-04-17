@@ -20,13 +20,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class DatabaseForge extends DataBase{
+class DatabaseForge extends DatabaseMysql{
 	function DatabaseForge($server=false, $user=false, $password=false,
 			       $dbName=false, $failFunction=false, $flags=0) {
 		global $wgDBtype;
 
 		$wgDBtype = "mysql";
-		return Database::__construct($server, $user,
+		return DatabaseMysql::__construct($server, $user,
 							  $password, $dbName, $failFunction, $flags);
 	}
 
@@ -35,7 +35,7 @@ class DatabaseForge extends DataBase{
 		case 'interwiki':
 			return Config::get('sys_dbname').'.plugin_mediawiki_interwiki';
 		default:
-			return Database::tableName($name);
+			return DatabaseMysql::tableName($name);
 		}
 	}
 }
