@@ -18,13 +18,13 @@ override_dh_install:
 	# Copy files for other packages
 	dh_install --remaining-packages -XLICENSE -XCOPYING -XLICENCE -Xlicense.txt -X.gitignore -XDebugger/CVS -Xjabbex_api/_tests
 	rm -f debian/tuleap-plugin-forumml/usr/share/tuleap/plugins/forumml/bin/ml_arch_2_DB.pl
-	# Update default configuration and other files for debian-specific
-	# changes
-	debian/update-installed-files
 	# Deploy ckeditor.conf
 	cp src/etc/ckeditor.conf.dist debian/tuleap/etc/apache2/conf.d/tuleap-plugins/ckeditor.conf
 	# Deploy mediawiki.conf
 	cp plugins/mediawiki/etc/mediawiki.conf.dist debian/tuleap-plugin-mediawiki/etc/apache2/conf.d/tuleap-plugins/mediawiki.conf
+	# Update default configuration and other files for debian-specific
+	# changes
+	debian/update-installed-files
 
 
 override_dh_fixperms:
