@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+handle_initial_install() {
+}
+
+handle_upgrade() {
+    # Re-generate language files if already configured
+    if [ -e /etc/tuleap/conf/local.inc ]; then
+	/usr/share/tuleap/src/utils/php-launcher.sh /usr/share/tuleap/src/utils/generate_language_files.php
+    fi
+
+    # Deploy mediawiki.conf
+    mw_conf_file=/etc/apache2/conf.d/tuleap-plugins/mediawiki.conf
+    if [ ! -f "$mw_conf_file" ]; then
+        cp /usr/share/tuleap/plugins/mediawiki/etc/mediawiki.conf.dist "$mw_conf_file"
+    fi
+}
+
+case "$1" in
+    configure)
+	if [ -z "$2" ]; then
+	    handle_initial_install
+	else
+	    handle_upgrade
+	fi
+    ;;
+esac
+
+#DEBHELPER#
+
