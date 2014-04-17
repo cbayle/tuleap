@@ -21,6 +21,11 @@ override_dh_install:
 	# Update default configuration and other files for debian-specific
 	# changes
 	debian/update-installed-files
+	# Deploy ckeditor.conf
+	cp src/etc/ckeditor.conf.dist debian/tuleap/etc/apache2/conf.d/tuleap-plugins/ckeditor.conf
+	# Deploy mediawiki.conf
+	cp plugins/mediawiki/etc/mediawiki.conf.dist debian/tuleap-plugin-mediawiki/etc/apache2/conf.d/tuleap-plugins/mediawiki.conf
+
 
 override_dh_fixperms:
 	dh_fixperms
