@@ -14,10 +14,14 @@ update_paths_in() {
     perl -pi -e 's|/etc/codendi|/etc/tuleap|g' $file
     perl -pi -e 's|/var/tmp/codendi_cache|/var/cache/tuleap|g' $file
     perl -pi -e 's|/var/www/cgi-bin|/usr/lib/cgi-bin|g' $file
+    perl -pi -e 's|/usr/share/mediawiki-tuleap|/usr/share/mediawiki|g' $file
 }
 
-for file in $(grep -r -l /codendi debian/tuleap/); do
-    update_paths_in $file
+for package in tuleap tuleap-plugin-mediawiki
+do
+	for file in $(grep -r -l /codendi debian/$package/); do
+    		update_paths_in $file
+	done
 done
 
 update_parameter codendi_cache_dir /var/cache/tuleap
@@ -26,3 +30,5 @@ update_parameter codendi_shell_skel /etc/tuleap_skel
 
 perl -pi -e "s|codendiadm|www-data|g" debian/tuleap/usr/share/tuleap/src/utils/cron.d/codendi
 perl -pi -e "s|tmpwatch|tmpreaper|g" debian/tuleap/usr/share/tuleap/src/utils/cron.d/codendi
+
+perl -pi -e "s|/usr/share/ckeditor|/usr/share/javascript/ckeditor|g" debian/tuleap/usr/share/tuleap/src/etc/ckeditor.conf.dist
