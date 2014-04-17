@@ -1,3 +1,4 @@
 var/lib/tuleap/mediawiki
 var/lib/tuleap/mediawiki/master
 var/lib/tuleap/mediawiki/projects
+etc/apache2/conf.d/tuleap-plugins
