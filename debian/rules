@@ -25,6 +25,10 @@ override_dh_install:
 	# Update default configuration and other files for debian-specific
 	# changes
 	debian/update-installed-files
+	# Make doc
+	make doc 
+	# Make less
+	make less
 
 
 override_dh_fixperms:
