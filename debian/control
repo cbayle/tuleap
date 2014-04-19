@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Tuleap Packaging Team <tuleap-devel@tuleap.net>
 Uploaders: Raphaël Hertzog <raphael@freexian.com>
-Build-Depends: debhelper (>= 9), twitter-recess, less, xsltproc
+Build-Depends: debhelper (>= 9), twitter-recess, less, xsltproc, docbook-xml
 Standards-Version: 3.9.3
 Homepage: http://www.tuleap.net
 Vcs-Git: ssh://gitolite@tuleap.net:tuleap/tuleap/stable.git
