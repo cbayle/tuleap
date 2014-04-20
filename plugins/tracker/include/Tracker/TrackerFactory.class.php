@@ -18,7 +18,6 @@
  * along with Codendi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 class TrackerFactory {
 
     /** @var array of Tracker */
@@ -173,7 +172,8 @@ class TrackerFactory {
                     $row['status'],
                     $row['deletion_date'],
                     $row['instantiate_for_new_projects'],
-                    $row['stop_notification']
+                    $row['stop_notification'],
+                    $row['color']
         );
     }
 
@@ -192,15 +192,18 @@ class TrackerFactory {
         // set general settings
         // real id will be set during Database update
         $att = $xml->attributes();
-        $row = array('id' => 0,
-                'name' => $name,
-                'group_id' =>$groupId,
-                'description' => $description,
-                'item_name' => $itemname,
-                'submit_instructions' => (string)$xml->submit_instructions,
-                'browse_instructions' => (string)$xml->browse_instructions,
-                'status' => '',
-                'deletion_date' => '');
+        $row = array(
+            'id'                  => 0,
+            'name'                => $name,
+            'group_id'            => $groupId,
+            'description'         => $description,
+            'item_name'           => $itemname,
+            'submit_instructions' => (string)$xml->submit_instructions,
+            'browse_instructions' => (string)$xml->browse_instructions,
+            'status'              => '',
+            'deletion_date'       => '',
+            'color'               => (string)$xml->color
+        );
         $row['allow_copy'] = isset($att['allow_copy']) ?
                 (int) $att['allow_copy'] : 0;
         $row['instantiate_for_new_projects'] = isset($att['instantiate_for_new_projects']) ?
@@ -604,11 +607,13 @@ class TrackerFactory {
      *
      */
     public function duplicate($from_project_id, $to_project_id, $ugroup_mapping) {
-        $tracker_mapping = array();
-        $field_mapping   = array();
+        $tracker_mapping        = array();
+        $field_mapping          = array();
+        $trackers_from_template = array();
 
         foreach($this->getTrackersByGroupId($from_project_id) as $tracker) {
             if ($tracker->mustBeInstantiatedForNewProjects()) {
+                $trackers_from_template[] = $tracker;
                 list($tracker_mapping, $field_mapping) = $this->duplicateTracker(
                         $tracker_mapping, 
                         $field_mapping, 
@@ -633,8 +638,11 @@ class TrackerFactory {
         if ($tracker_mapping) {
             $hierarchy_factory = $this->getHierarchyFactory();
             $hierarchy_factory->duplicate($tracker_mapping);
-        }
 
+            $trigger_rules_manager = $this->getTriggerRulesManager();
+            $trigger_rules_manager->duplicate($trackers_from_template, $field_mapping);
+
+        }
         $shared_factory = $this->getFormElementFactory();
         $shared_factory->fixOriginalFieldIdsAfterDuplication($to_project_id, $from_project_id, $field_mapping);
 
@@ -643,6 +651,25 @@ class TrackerFactory {
             'field_mapping'   => $field_mapping,
             'group_id'        => $to_project_id
         ));
+    }
+
+    /**
+     * @return Tracker_Workflow_Trigger_RulesManager
+     */
+    protected function getTriggerRulesManager() {
+        $trigger_rule_dao        = new Tracker_Workflow_Trigger_RulesDao();
+        $workflow_backend_logger = new WorkflowBackendLogger(new BackendLogger());
+        $rules_processor         = new Tracker_Workflow_Trigger_RulesProcessor(
+            new Tracker_Workflow_WorkflowUser(),
+            $workflow_backend_logger
+        );
+
+        return new Tracker_Workflow_Trigger_RulesManager(
+            $trigger_rule_dao,
+            $this->getFormElementFactory(),
+            $rules_processor,
+            $workflow_backend_logger
+        );
     }
 
     /**
@@ -868,7 +895,9 @@ class TrackerFactory {
                 '',
                 '',
                 $tracker->instantiate_for_new_projects,
-                $tracker->stop_notification);
+                $tracker->stop_notification,
+                $tracker->color
+        );
         if ($tracker_id) {
             $trackerDB = $this->getTrackerById($tracker_id);
             //create cannedResponses

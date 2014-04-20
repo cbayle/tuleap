@@ -22,7 +22,20 @@ body {
         border-bottom-color: #B2B2B2;
     }
 
-    .tracker_report_query {
+    #tracker_report_query {
         border-top: 2px solid @orange;
+    }
+
+    .hidden-artifact-submit-button {
+        .artifact-submit-button;
+        display: none;
+    }
+
+    .tracker_artifact_fieldset legend {
+        color: @orange;
+
+        &.toggler-noajax {
+            border-bottom: 2px solid @orange;
+        }
     }
 }

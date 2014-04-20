@@ -278,8 +278,8 @@ plugin_tracker_include_canned	no_canned_response	Aucune réponse type définie p
 # Script: SF/www/tracker/include/ArtifactFieldHtml.class.php
 #
 plugin_tracker_include_field	error_no_atid	ERREUR - pas group_artifact_id
-plugin_tracker_include_field	start	Début&nbsp;:
-plugin_tracker_include_field	end	Fin&nbsp;:
+plugin_tracker_include_field	start	Début
+plugin_tracker_include_field	end	Fin
 plugin_tracker_include_field	any_time	N'importe quand
 plugin_tracker_include_field	pick_date	Cliquer ici pour choisir une date
 plugin_tracker_include_field	unknown_display_type	$1&nbsp;: Type d'affichage du champ inconnu
@@ -335,6 +335,7 @@ plugin_tracker_include_artifact	summary	Résumé
 plugin_tracker_include_artifact	group	Groupe
 plugin_tracker_include_artifact	comment_type	Type de commentaire&nbsp;:
 plugin_tracker_include_artifact	add_comment	Ajouter un commentaire
+plugin_tracker_include_artifact	toggle_diff	Afficher le diff
 plugin_tracker_include_artifact	depend_on	Dépend de&nbsp;:
 plugin_tracker_include_artifact	cc_address	Adresse en CC
 plugin_tracker_include_artifact	comment	Commentaire
@@ -378,6 +379,8 @@ plugin_tracker_include_artifact	permissions_label	Restreindre l'accès à cet ar
 plugin_tracker_include_artifact	permissions_not_restricted	Les permissions ne sont pas restreintes pour cet artefact
 plugin_tracker_include_artifact	permissions_use_default	Utiliser les permissions par défaut de l'outil de suivi
 plugin_tracker_include_artifact	comment_cleared	Commentaire effacé
+plugin_tracker_include_artifact	color	Couleur
+plugin_tracker_include_artifact	preview	Aperçu :
 #
 #-----------------------------------------------
 # Script: SF/www/tracker/include/ArtifactReportHtml.class.php
@@ -475,8 +478,9 @@ plugin_tracker_include_type	perm	Permissions
 plugin_tracker_include_type	del_user	Détruire cet utilisateur ?
 plugin_tracker_include_type	no_user	Aucun utilisateur pour cet outil de suivi.
 plugin_tracker_include_type	allow_copy	Autoriser la copie d'artefacts&nbsp;:
-plugin_tracker_include_type	submit_instr	<b>Instructions de soumissions</b>&nbsp;:<br><i>(Balises HTML autorisées)</i>
-plugin_tracker_include_type	browse_instr	<b>Instructions de navigation</b>&nbsp;:<br><i>(Balises HTML autorisées)</i>
+plugin_tracker_include_type	submit_instr	Instructions de soumissions
+plugin_tracker_include_type	browse_instr	Instructions de navigation
+plugin_tracker_include_type	html_tags	(Balises HTML autorisées)
 plugin_tracker_include_type	fill_name	Veuillez remplir le nom de l'outil de suivi.
 plugin_tracker_include_type	fill_desc	Veuillez remplir la description de l'outil de suivi.
 plugin_tracker_include_type	fill_short	Veuillez remplir le nom court de l'outil de suivi.
@@ -777,7 +781,7 @@ plugin_tracker_common_artifacts	not_get	Récupération impossible des artefacts&
 plugin_tracker_common_type	invalid	Pas d'objet de groupe valide
 plugin_tracker_common_type	no_match	Group_id dans la BDD ne correspond pas à l'objet Group
 plugin_tracker_common_type	perm_fail	La création des permissions utilisateurs a échoué&nbsp;: $1
-plugin_tracker_common_type	name_requ	Le nom , la description et la nom court sont obligatoires.
+plugin_tracker_common_type	name_requ	Le nom , la description, la couleur et le nom court sont obligatoires.
 plugin_tracker_common_type	invalid_shortname	Nom court invalide&nbsp;: $1. Veuillez utiliser uniquement des caractères alphanumériques ou un nom court non réservé. Retournez à la page précédente et modifiez ce champ.
 plugin_tracker_common_type	invalid_templ	Le patron de projet selectionné est invalide
 plugin_tracker_common_type	invalid_tracker_tmpl	Le patron d'outil de suivi selectionné est invalide
@@ -1279,8 +1283,8 @@ plugin_tracker_report	revert	Annuler
 plugin_tracker_report	replace_existing_report	Remplacer un rapport existant
 plugin_tracker_report	change_visibility	Modifier la visibilité
 plugin_tracker_report	current_report	Rapport :
-plugin_tracker_report	toggle_criteria	Modifier les critères
-plugin_tracker_report	toggle_columns	Modifier les colonnes
+plugin_tracker_report	toggle_criteria	Critères
+plugin_tracker_report	toggle_columns	Colonnes
 plugin_tracker_report	sort_by	Triés par : 
 plugin_tracker_report	reset_sort	Réinitialiser le tri
 plugin_tracker_report	disable_multisort	Desactiver le tri multi-colonnes
@@ -1304,6 +1308,7 @@ plugin_tracker_report	isobsolete_explanations	Le rapport a été modifié par <s
 plugin_tracker_report	haschanged_isobsolete_explanations	Le rapport a été modifié par <span class="tracker_report_updated_by">$1</span>. Vous pouvez :
 plugin_tracker_report	renderer_name_mandatory	Le nom est obligatoire.
 plugin_tracker_report	set_default_report	Mettre ce rapport par défaut
+plugin_tracker_report	search	Rechercher
 
 plugin_tracker_report_widget	go_to_report	Voir le rapport
 
@@ -1313,21 +1318,14 @@ plugin_tracker_stat	recent_activity	Activité récente :
 plugin_tracker_stat	last_update	Dernière modification
 plugin_tracker_stat	last_artifact_created	Dernier artifact crée
 
-plugin_tracker_aggregate	AVG_sel	AVG - Moyenne
-plugin_tracker_aggregate	AVG_title	Moyenne&nbsp;:
-plugin_tracker_aggregate	COUNT_sel	COUNT - Nombre
-plugin_tracker_aggregate	COUNT_title	Nombre&nbsp;:
-plugin_tracker_aggregate	COUNT_GRBY_sel	COUNT GROUP BY - Nombre (par groupe)
-plugin_tracker_aggregate	COUNT_GRBY_title	Nombre (par groupe)&nbsp;:
-plugin_tracker_aggregate	MAX_sel	MAX - Maximum
-plugin_tracker_aggregate	MAX_title	Maximum:
-plugin_tracker_aggregate	MIN_sel	MIN - Minimum
-plugin_tracker_aggregate	MIN_title	Minimum:
-plugin_tracker_aggregate	STD_sel	STD - Écart type
-plugin_tracker_aggregate	STD_title	Écart type&nbsp;:
-plugin_tracker_aggregate	SUM_sel	SUM - Somme
-plugin_tracker_aggregate	SUM_title	Somme&nbsp;:
-plugin_tracker_aggregate	toggle	-- Activer une fonction d'aggrégation
+plugin_tracker_aggregate	AVG	Moyenne
+plugin_tracker_aggregate	COUNT	Nombre
+plugin_tracker_aggregate	COUNT_GRBY	Nombre (par groupe)
+plugin_tracker_aggregate	MAX	Maximum
+plugin_tracker_aggregate	MIN	Minimum
+plugin_tracker_aggregate	STD	Écart type
+plugin_tracker_aggregate	SUM	Somme
+plugin_tracker_aggregate	toggle	Activer une fonction d'aggrégation
 
 
 plugin_tracker_search_index	artifact_title	Titre de l'artefact

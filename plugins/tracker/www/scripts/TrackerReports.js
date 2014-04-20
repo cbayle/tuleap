@@ -26,6 +26,10 @@ var codendi = codendi || { };
 codendi.tracker = codendi.tracker || { };
 codendi.tracker.report = codendi.tracker.report || { };
 
+var tuleap = tuleap || { };
+tuleap.tracker = tuleap.tracker || { };
+tuleap.tracker.report = tuleap.tracker.report || { };
+
 codendi.tracker.report.setHasChanged = function () {
     var save_or_revert = $('tracker_report_save_or_revert');
     save_or_revert.setStyle('display: inline;');
@@ -71,7 +75,7 @@ codendi.tracker.report.table.saveColumnsWidth = function (table, onComplete) {
     var total = table.offsetWidth - 16;
     var parameters = {
         func:     'renderer',
-        renderer: $('tracker_report_table_addcolumn_form').renderer.value
+        renderer: $('tracker_report_renderer_current').readAttribute('data-renderer-id')
     };
     var cells = table.rows[0].cells;
     var n = cells.length;
@@ -93,102 +97,69 @@ codendi.tracker.report.table.saveColumnsWidth = function (table, onComplete) {
     });
 };
 
-codendi.tracker.report.table.AddRemoveColumn = Class.create({
+tuleap.tracker.report.FieldsDropDown = Class.create({
     /**
      * Constructor
      */
-    initialize: function (selectbox) {
-        this.toggle_event = this.toggle.bindAsEventListener(this);
-        this.prefix       = 'tracker_report_table_add_column_';
-        
-        var panel = new Element('table').addClassName('dropdown_panel').setStyle({
-            textAlign: 'left',
-            opacity: 0.9
-        });
-        var ul = new Element('ul');
-        var btn_label = '';
-        selectbox.childElements().each((function (el, index) {
-            if (index) {
-                if (el.tagName.toLowerCase() === 'option') {
-                    ul.appendChild(this.buildCol(el.value, el.className, el.innerHTML));
-                } else {
-                    var subul = new Element('ul', {id: el.id});
-                    el.childElements().each(function (subel) {
-                        subul.appendChild(this.buildCol(subel.value, subel.className, subel.innerHTML));
-                    }.bind(this));
-                    ul.appendChild(new Element('li').update(new Element('strong').update(el.label)).insert(subul).setStyle({
-                        display: subul.childElements().length ? 'block' : 'none'
-                    }));
-                }
-            } else { //the first one, "-- Add column". don't need it.
-                btn_label = el.text.gsub(/^--\s*/, '');
-            }
-        }).bind(this));
-        var handle = new Element('a', {
-            href: '#', 
-            title: btn_label,
-            style: "font-size: 0.8em;"
-        }).update(btn_label + ' <img src="' + codendi.imgroot + 'ic/sort--plus.png" style="vertical-align: middle;" />');
-        
-        Element.remove(
-            selectbox.insert({
-                after: handle 
-            })
-        );
-        ul.id = selectbox.id;
-        handle.insert({
-            after: panel.insert(
-                new Element('tbody').insert(
-                    new Element('tr').insert(
-                        new Element('td').insert(ul)
-                    )
-                )
-            )
-        });
-        this.panel = new codendi.DropDownPanel(panel, handle);
-    },
-    /**
-     * Build a li in the dropdown panel to toggle a column
-     */
-    buildCol: function (id, className, label) {
-        return new Element('li', 
-            { 
-                id: this.prefix + id
-            }).addClassName(className)
-            .update(label)
-            .observe('click', this.toggle_event);
+    initialize: function (selectbox, actions) {
+        this.actions = actions;
+        selectbox.select('li').each(function (criterion) {
+           criterion.observe('click', function (event) {
+               this.toggle(criterion);
+               event.stop();
+           }.bind(this));
+        }.bind(this));
     },
     /**
      * event listener to toggle a column
      */
-    toggle: function (evt) {
-        var li = evt.element();
-        li.addClassName(this.prefix + 'waiting');
-        if (li.hasClassName(this.prefix + 'used')) {
-            this.remove(li.id.match(/_(\d+)$/)[1], li);
+    toggle: function (li) {
+        if (li.readAttribute('data-field-is-used') === '0') {
+            this.actions.add(this, li);
         } else {
-            this.add(li.id.match(/_(\d+)$/)[1], li);
+            this.actions.remove(this, li);
         }
     },
     /**
-    * Add a column to the table 
+     * Set the class name of the li to used and clear waiting
      */
-    add: function (field_id, li) {
-        var form = $('tracker_report_table_addcolumn_form');
+    setUsed: function (li) {
+        li.writeAttribute('data-field-is-used', '1');
+        li.select('a').each(function (element) {
+           element.insert({top: new Element('i', {"class": "icon-ok"})});
+        });
+    },
+    /**
+     * Set the class name of the li to unused and clear waiting
+     */
+    setUnused: function (li) {
+        li.writeAttribute('data-field-is-used', '0');
+        li.select('i').each(function (element) {
+           element.remove();
+        });
+    }
+});
+
+codendi.tracker.report.table.AddRemoveColumn = Class.create({
+    /**
+     * Add a column to the table
+     */
+    add: function (dropdown, li) {
+        var field_id = li.readAttribute('data-field-id');
         if ($('tracker_report_table_column_' + field_id)) {
             $$('.tracker_report_table_column_' + field_id).invoke('show');
             $('tracker_report_table_column_' + field_id).show();
-            
+
             codendi.tracker.report.table.saveColumnsWidth($('tracker_report_table'));
-            
-            this.setUsed(li);
+
+            dropdown.setUsed(li);
         } else {
             var req = new Ajax.Request(
-                codendi.tracker.base_url + '?report=' + form.report.value + '&renderer=' + form.renderer.value,
+                codendi.tracker.base_url + '?report=' + $('tracker_report_query').readAttribute('data-report-id') + '&renderer=' + $('tracker_report_renderer_current').readAttribute('data-renderer-id'),
                 {
                     parameters: {
                         func:                         'renderer',
-                        renderer:                     form.renderer.value,
+                        renderer:                     $('tracker_report_renderer_current').readAttribute('data-renderer-id'),
                         'renderer_table[add-column]': field_id
                     },
                     onSuccess: function (transport) {
@@ -201,35 +172,37 @@ codendi.tracker.report.table.AddRemoveColumn = Class.create({
                                 tr.insert(new_trs.pop().down('td'));
                             }
                         });
-                        
+
                         $$('tr.tracker_report_table_no_result td').each( function (td) {
                             td.colSpan = td.up('table').rows[0].cells.length;
                         });
-                        
+
                         codendi.tracker.report.table.saveColumnsWidth($('tracker_report_table'));
-                        
+
                         //Remove entry from the selectbox
-                        this.setUsed(li);
-                        
+                        dropdown.setUsed(li);
+
                         //eval scripts now (prototype defer scripts eval but we need them now for decorators)
                         //transport.responseText.evalScripts();
-                        
+
                         //load aggregates
                         var selectbox = $('tracker_report_table').down('select[name="tracker_aggregate_function_add['+field_id+']"]');
                         if (selectbox) {
                             var report_id   = $F($('tracker_report_query_form')['report']);
-                            var renderer_id = $$('.tracker_report_renderer')[0].id.gsub('tracker_report_renderer_', '');
+                            var renderer_id = $('tracker_report_renderer_current').readAttribute('data-renderer-id');
                             codendi.tracker.report.loadAggregates(selectbox, report_id, renderer_id);
                         }
-                        
+
                         codendi.tracker.report.setHasChanged();
-                        
+
+                        tuleap.trackers.report.table.fixAggregatesHeights();
+
                         //reorder
                         codendi.reorder_columns[$('tracker_report_table').identify()].register(new_column);
-                        
+
                         //resize
                         TableKit.reload();
-                        
+
                     }.bind(this)
                 }
             );
@@ -238,7 +211,8 @@ codendi.tracker.report.table.AddRemoveColumn = Class.create({
     /**
      * remove a column to the table
      */
-    remove: function (field_id, li) {
+    remove: function (dropdown, li) {
+        var field_id = li.readAttribute('data-field-id');
         if ($('tracker_report_table_sort_by_' + field_id)) {
             //If the column is used to sort, we need to refresh all the page
             //Because we need to resort all the table
@@ -255,19 +229,18 @@ codendi.tracker.report.table.AddRemoveColumn = Class.create({
             }
             col.hide();
             $$('.tracker_report_table_column_' + field_id).invoke('hide');
-            
+
             codendi.tracker.report.table.saveColumnsWidth($('tracker_report_table'), function () {
                 location.href = location.href +
-                                '&func=renderer' + 
-                                '&renderer=' + $('tracker_report_table_addcolumn_form').renderer.value +
+                                '&func=renderer' +
+                                '&renderer=' + $('tracker_report_renderer_current').readAttribute('data-renderer-id') +
                                 '&renderer_table[remove-column]=' + field_id;
             });
         } else {
-            var form = $('tracker_report_table_addcolumn_form');
-            var req = new Ajax.Request(codendi.tracker.base_url + '?report=' + form.report.value + '&renderer=' + form.renderer.value, {
+            var req = new Ajax.Request(codendi.tracker.base_url + '?report=' + $('tracker_report_query').readAttribute('data-report-id') + '&renderer=' + $('tracker_report_renderer_current').readAttribute('data-renderer-id'), {
                 parameters: {
                     func:                            'renderer',
-                    renderer:                        $('tracker_report_table_addcolumn_form').renderer.value,
+                    renderer:                        $('tracker_report_renderer_current').readAttribute('data-renderer-id'),
                     'renderer_table[remove-column]': field_id
                 },
                 onSuccess: function () {
@@ -283,130 +256,38 @@ codendi.tracker.report.table.AddRemoveColumn = Class.create({
                     }
                     col.hide();
                     $$('.tracker_report_table_column_' + field_id).invoke('hide');
-                    
+
                     codendi.tracker.report.table.saveColumnsWidth($('tracker_report_table'));
-                    
-                    this.setUnused(li);
+
+                    tuleap.trackers.report.table.fixAggregatesHeights();
+
+                    dropdown.setUnused(li);
                     codendi.tracker.report.setHasChanged();
                 }.bind(this)
             });
         }
-    },
-    /**
-     * Set the class name of the li to used and clear waiting
-     */
-    setUsed: function (li) {
-        li.removeClassName(this.prefix + 'unused');
-        li.removeClassName(this.prefix + 'waiting');
-        li.addClassName(this.prefix + 'used');
-    },
-    /**
-     * Set the class name of the li to unused and clear waiting
-     */
-    setUnused: function (li) {
-        li.removeClassName(this.prefix + 'used');
-        li.removeClassName(this.prefix + 'waiting');
-        li.addClassName(this.prefix + 'unused');
     }
 });
 
-
 codendi.tracker.report.AddRemoveCriteria = Class.create({
     /**
-     * Constructor
+     * Add a column to the table: criterion
      */
-    initialize: function (selectbox) {
-        this.toggle_event = this.toggle.bindAsEventListener(this);
-        this.prefix       = 'tracker_report_add_criteria_';
-        
-        var panel = new Element('table').addClassName('dropdown_panel').setStyle({
-            textAlign: 'left',
-            opacity: 0.9
-        });
-        var ul = new Element('ul');
-        var btn_label = '';
-        selectbox.childElements().each((function (el, index) {
-            if (index) {
-                if (el.tagName.toLowerCase() === 'option') {
-                    ul.appendChild(this.buildCol(el.value, el.className, el.innerHTML));
-                } else {
-                    var subul = new Element('ul', {id: el.id});
-                    el.childElements().each(function (subel) {
-                        subul.appendChild(this.buildCol(subel.value, subel.className, subel.innerHTML));
-                    }.bind(this));
-                    ul.appendChild(new Element('li').update(new Element('strong').update(el.label)).insert(subul).setStyle({
-                        display: subul.childElements().length ? 'block' : 'none'
-                    }));
-                }
-            } else { //the first one, "-- Add column". don't need it.
-                btn_label = el.text.gsub(/^--\s*/, '');
-            }
-        }).bind(this));
-        var handle = new Element('a', {
-            href: '#', 
-            title: btn_label,
-            style: "font-size: 0.8em;"
-        }).update(btn_label + ' <img src="' + codendi.imgroot + 'ic/ui-search-field--plus.png" style="vertical-align: middle;" />');
-        
-        Element.remove(
-            selectbox.insert({
-                after: handle 
-            })
-        );
-        ul.id = selectbox.id;
-        handle.insert({
-            after: panel.insert(
-                new Element('tbody').insert(
-                    new Element('tr').insert(
-                        new Element('td').insert(ul)
-                    )
-                )
-            )
-        });
-        this.panel = new codendi.DropDownPanel(panel, handle);
-    },
-    /**
-     * Build a li in the dropdown panel to toggle a column
-     */
-    buildCol: function (id, className, label) {
-        return new Element('li', 
-            { 
-                id: this.prefix + id
-            }).addClassName(className)
-            .update(label)
-            .observe('click', this.toggle_event);
-    },
-    /**
-     * event listener to toggle a column
-     */
-    toggle: function (evt) {
-        var li = evt.element();
-        li.addClassName(this.prefix + 'waiting');
-        if (li.hasClassName(this.prefix + 'used')) {
-            this.remove(li.id.match(/_(\d+)$/)[1], li);
-        } else {
-            this.add(li.id.match(/_(\d+)$/)[1], li);
-        }
-    },
-    /**
-     * Add a column to the table: criteria???
-     */
-    add: function (field_id, li) {
-        var form = $('tracker_report_table_addcolumn_form'),
-            req;
+    add: function (dropdown, li) {
+        var field_id = li.readAttribute('data-field-id');
         if ($('tracker_report_crit_' + field_id)) {
             $$('.tracker_report_crit_' + field_id).invoke('show');
             $('tracker_report_crit_' + field_id).show();
-            this.setUsed(li);
+            dropdown.setUsed(li);
             codendi.tracker.report.setHasChanged();
-            req = new Ajax.Request(location.href, {
+            new Ajax.Request(location.href, {
                 parameters: {
                     func: 'add-criteria',
                     field: field_id
                 }
             });
         } else {
-            req = new Ajax.Request(location.href, {
+            new Ajax.Request(location.href, {
                 parameters: {
                     func: 'add-criteria',
                     field: field_id
@@ -414,18 +295,19 @@ codendi.tracker.report.AddRemoveCriteria = Class.create({
                 onSuccess: function (transport) {
                     var crit = new Element('li', {id: 'tracker_report_crit_' + field_id}).update(transport.responseText);
                     $('tracker_query').insert(crit);
-                    
+
                     //Remove entry from the selectbox
-                    this.setUsed(li);
-                    
+                    dropdown.setUsed(li);
+
                     codendi.tracker.report.setHasChanged();
-                    
+
                     //eval scripts now (prototype defer scripts eval but we need them now for decorators)
                     transport.responseText.evalScripts();
-                    
+
                     //initialize events and other dynamic stuffs
                     codendi.tracker.report.loadAdvancedCriteria(crit.down('img.tracker_report_criteria_advanced_toggle'));
-                    crit.select('input', 'select').map(datePickerController.create);
+
+                    tuleap.dateTimePicker.init();
                 }.bind(this)
             });
         }
@@ -433,10 +315,9 @@ codendi.tracker.report.AddRemoveCriteria = Class.create({
     /**
      * remove a criteria
      */
-    remove: function (field_id, li) {
-        //We don't need for now to make an ajax call... let's wait for the brainstorming on this topic
-        //If so, please remove the 3 lines above
-        var req = new Ajax.Request(location.href, {
+    remove: function (dropdown, li) {
+        var field_id = li.readAttribute('data-field-id');
+        new Ajax.Request(location.href, {
             parameters: {
                 func: 'remove-criteria',
                 field: field_id
@@ -444,27 +325,11 @@ codendi.tracker.report.AddRemoveCriteria = Class.create({
             onSuccess: function () {
                 $$('.tracker_report_crit_' + field_id).invoke('hide');
                 $('tracker_report_crit_' + field_id).hide();
-                this.setUnused(li);
-                
+                dropdown.setUnused(li);
+
                 codendi.tracker.report.setHasChanged();
             }.bind(this)
         });
-    },
-    /**
-     * Set the class name of the li to used and clear waiting
-     */
-    setUsed: function (li) {
-        li.removeClassName(this.prefix + 'unused');
-        li.removeClassName(this.prefix + 'waiting');
-        li.addClassName(this.prefix + 'used');
-    },
-    /**
-     * Set the class name of the li to unused and clear waiting
-     */
-    setUnused: function (li) {
-        li.removeClassName(this.prefix + 'used');
-        li.removeClassName(this.prefix + 'waiting');
-        li.addClassName(this.prefix + 'unused');
     }
 });
 
@@ -491,7 +356,7 @@ codendi.tracker.report.loadAdvancedCriteria = function (element) {
                     li.select('input', 'select').each(function (el) {
                         if (el.id && $('fd-' + el.id)) {
                             delete $('fd-' + el.id).remove();
-                            delete datePickerController.datePickers[el.id];
+                            //delete datePickerController.datePickers[el.id];
                         }
                     });
                     
@@ -502,7 +367,7 @@ codendi.tracker.report.loadAdvancedCriteria = function (element) {
                     
                     //initialize events and other dynamic stuffs
                     codendi.tracker.report.loadAdvancedCriteria(li.down('img.tracker_report_criteria_advanced_toggle'));
-                    li.select('input', 'select').map(datePickerController.create);
+                    tuleap.dateTimePicker.init();
                 }
             });
             Event.stop(evt);
@@ -633,16 +498,21 @@ document.observe('dom:loaded', function () {
         $$('img.tracker_report_criteria_advanced_toggle').map(codendi.tracker.report.loadAdvancedCriteria);
         
         //User add criteria
-        if ($('tracker_report_add_criteria')) {
-            var arcr = new codendi.tracker.report.AddRemoveCriteria($('tracker_report_add_criteria'));
+        if ($('tracker_report_add_criteria_dropdown')) {
+            new tuleap.tracker.report.FieldsDropDown(
+                $('tracker_report_add_criteria_dropdown'),
+                new codendi.tracker.report.AddRemoveCriteria()
+            );
         }
-        
         
         //User add/remove column
-        if ($('tracker_report_table_add_column')) {
-            var arco = new codendi.tracker.report.table.AddRemoveColumn($('tracker_report_table_add_column'));
+        if ($('tracker_report_add_columns_dropdown')) {
+            new tuleap.tracker.report.FieldsDropDown(
+                $('tracker_report_add_columns_dropdown'),
+                new codendi.tracker.report.table.AddRemoveColumn()
+            );
         }
-        
+
         // Masschange
         var button      = $$('input[name="renderer_table[masschange_all]"]')[0];
         var mc_panel    = $('tracker_report_table_masschange_panel');
@@ -738,6 +608,7 @@ document.observe('dom:loaded', function () {
             TableKit.options.observers.onResizeEnd = function (table) {
                 if (TableKit.Resizable._cell && TableKit.Resizable._cell.id.match(/_\d+$/)) {
                     codendi.tracker.report.table.saveColumnsWidth(table);
+                    tuleap.trackers.report.table.fixAggregatesHeights();
                 }
             };
         }
@@ -750,8 +621,8 @@ document.observe('dom:loaded', function () {
     }
     if ($('tracker_report_query_form')) {
         
-        var report_id   = $F($('tracker_report_query_form')['report']);
-        var renderer_id = $$('.tracker_report_renderer')[0].id.gsub('tracker_report_renderer_', '');
+        var report_id   = $('tracker_report_query').readAttribute('data-report-id');
+        var renderer_id = $('tracker_report_renderer_current').readAttribute('data-renderer-id');
         
         /*var form = $('tracker_report_query_form');
         if (form) {

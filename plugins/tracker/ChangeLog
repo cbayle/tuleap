@@ -1,3 +1,111 @@
+Version 5.337 - Tuleap 6.13
+    * tasks #6674 / story #6409: Dropdown for comment order and display changes
+
+Version 5.336 - Tuleap 6.13
+    * tasks #6730: Use white/black color for xref-in-title
+
+Version 5.335 - Tuleap 6.13
+    * tasks #6672 / story #6409: Hide html diffs by default, display them on click on 'show' button
+
+Version 5.334 - Tuleap 6.13
+    * story #6409 Fix CSS issue on IE8
+
+Version 5.333 - Tuleap 6.13
+    * tasks #6627 / story #6409: Warn user on page leave if he has made changes
+
+Version 5.332 - Tuleap 6.13
+    * Fix request #6731: Artifact link modal window is opening when performing a carriage return
+
+Version 5.331 - Tuleap 6.13
+    * tasks #6684: max width for artifact view (960px)
+
+Version 5.330 - Tuleap 6.13
+    * request #6729: Fix brundown fatal error
+
+Version 5.329 - Tuleap 6.13
+    * task #6693 / story #6409 - XrefAndTitle is used in select box and are now broken
+
+Version 5.328 - Tuleap 6.13
+    * tasks #6724: Mustachify tracker settings form
+
+Version 5.327 - Tuleap 6.13
+    * tasks #6704: Display a live preview when selection a new tracker color
+
+Version 5.326 - Tuleap 6.13
+    * tasks #6713: No more have radio button in tracker settings form
+
+Version 5.325 - Tuleap 6.13
+    * tasks #6702: Color is used in Tracker
+
+Version 5.324 - Tuleap 6.13
+    * Story #6696: admin can choose a color for its tracker
+
+Version 5.323 - Tuleap 6.13
+    * tasks #6692: Submit bar doesn't appear with an HTML followup
+
+Version 5.322 - Tuleap 6.13
+    * tasks #6614: style aggregates
+
+Version 5.321 - Tuleap 6.13
+    * story #6671 / tasks #6644: Set right margin-left on submit bar when it's displayed (and on sidebar events)
+
+Version 5.320 - Tuleap 6.13
+    * tasks #6626 - Glossification of the artifact view
+
+Version 5.318 - Tuleap 6.13
+    * task #6624 - Remove edit buttons and action
+
+Version 5.318 - Tuleap 6.13
+    * Follow-up to task #6605: Report duplication issues
+
+Version 5.317 - Tuleap 6.13
+    * Development: Add a script to delete multiple artifacts
+
+Version 5.316 - Tuleap 6.13
+    * Submission bar should not be displayed at first
+
+Version 5.315 - Tuleap 6.13
+    * Fix tasks #6666: Additional lines are not yellow in artifact link
+
+Version 5.314 - Tuleap 6.13
+    * Follow up to tasks #6607: issue with 'Add to my dashboard'
+
+Version 5.313 - Tuleap 6.13
+    * Fields dependencies recursively loaded on switch
+
+Version 5.312 - Tuleap 6.13
+    * Change style of add/remove columns
+
+Version 5.311 - Tuleap 6.13
+    * Change style of add/remove criteria
+
+Version 5.310 - Tuleap 6.13
+    * Fix warning with datepicker.js
+
+Version 5.309 - Tuleap 6.13
+    * fatal error with advanced criteria in tracker reports
+
+Version 5.308 - Tuleap 6.13
+    * request #6632: trigger rules are duplicated
+
+Version 5.307 - Tuleap 6.13
+    * tasks #6660: renderer table headers in artifact link
+
+Version 5.306 - Tuleap 6.13
+    * Add field switch & display submit button
+
+Version 5.305 - Tuleap 6.13
+    * Submit bar instead of submit buttons in artifacts
+
+Version 5.304 - Tuleap 6.13
+    * Fix tasks #6637: fix z-index issue on IE9/Chrome for dropdown menu
+
+Version 5.303 - Tuleap 6.13
+    * Load edit form with the artifact view (form hidden)
+
+Version 5.302 - Tuleap 6.13
+    * tasks #6652 - Change style of add/remove criteria
+
 Version 5.301 - Tuleap 6.13
     * tasks #6610: Date criteria
 

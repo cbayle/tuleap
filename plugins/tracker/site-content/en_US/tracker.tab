@@ -286,8 +286,8 @@ plugin_tracker_include_canned	no_canned_response	No canned responses set up yet 
 # Script: SF/www/tracker/include/ArtifactFieldHtml.class.php
 #
 plugin_tracker_include_field	error_no_atid	ERROR - no group_artifact_id
-plugin_tracker_include_field	start	Start:
-plugin_tracker_include_field	end	End:
+plugin_tracker_include_field	start	Start
+plugin_tracker_include_field	end	End
 plugin_tracker_include_field	any_time	Any time
 plugin_tracker_include_field	pick_date	Click Here to Pick up a date
 plugin_tracker_include_field	unknown_display_type	$1: UNKNOWN ARTIFACT FIELD DISPLAY TYPE
@@ -343,6 +343,7 @@ plugin_tracker_include_artifact	summary	Summary
 plugin_tracker_include_artifact	group	Group
 plugin_tracker_include_artifact	comment_type	Comment Type:
 plugin_tracker_include_artifact	add_comment	Add a follow-up comment
+plugin_tracker_include_artifact	toggle_diff	Show diff
 plugin_tracker_include_artifact	depend_on	Dependent on:
 plugin_tracker_include_artifact	cc_address	CC Address
 plugin_tracker_include_artifact	comment	Comment
@@ -386,6 +387,8 @@ plugin_tracker_include_artifact	permissions_label	Restrict access to this artifa
 plugin_tracker_include_artifact	permissions_not_restricted	Permissions are not restricted for this artifact
 plugin_tracker_include_artifact	permissions_use_default	Use default tracker permissions
 plugin_tracker_include_artifact	comment_cleared	Comment has been cleared
+plugin_tracker_include_artifact	color	Color
+plugin_tracker_include_artifact	preview	Preview:
 
 #
 #-----------------------------------------------
@@ -484,8 +487,9 @@ plugin_tracker_include_type	perm	Permissions
 plugin_tracker_include_type	del_user	Delete this user?
 plugin_tracker_include_type	no_user	No users for this tracker.
 plugin_tracker_include_type	allow_copy	Allow artifact duplication:
-plugin_tracker_include_type	submit_instr	<b>Submit instructions</b>:<br><i>(HTML tags allowed)</i>
-plugin_tracker_include_type	browse_instr	<b>Browse instructions</b>:<br><i>(HTML tags allowed)</i>
+plugin_tracker_include_type	submit_instr	Submit instructions
+plugin_tracker_include_type	browse_instr	Browse instructions
+plugin_tracker_include_type	html_tags	(HTML tags allowed)
 plugin_tracker_include_type	fill_name	Please, fill the tracker name.
 plugin_tracker_include_type	fill_desc	Please, fill the tracker description.
 plugin_tracker_include_type	fill_short	Please, fill the tracker short name.
@@ -785,7 +789,7 @@ plugin_tracker_common_artifacts	not_get	Could not get artifacts: $1
 plugin_tracker_common_type	invalid	No Valid Group Object
 plugin_tracker_common_type	no_match	Group_id in db result does not match Group Object
 plugin_tracker_common_type	perm_fail	Failed to create user permission: $1
-plugin_tracker_common_type	name_requ	Name, Description, and Short Name are required.
+plugin_tracker_common_type	name_requ	Name, Description, Color, and Short Name are required.
 plugin_tracker_common_type	invalid_shortname	Invalid short name: $1. Please use only alphanumerical characters or an unreserved reference. Press the "Back" button and update this information.
 plugin_tracker_common_type	invalid_templ	Invalid project template
 plugin_tracker_common_type	invalid_tracker_tmpl	Invalid tracker template
@@ -1281,8 +1285,8 @@ plugin_tracker_report	revert	Revert
 plugin_tracker_report	replace_existing_report	Replace an existing report
 plugin_tracker_report	change_visibility	Change the visibility
 plugin_tracker_report	current_report	Report:
-plugin_tracker_report	toggle_criteria	Toggle criteria
-plugin_tracker_report	toggle_columns	Toggle columns
+plugin_tracker_report	toggle_criteria	Criteria
+plugin_tracker_report	toggle_columns	Columns
 plugin_tracker_report	sort_by	Sort by:
 plugin_tracker_report	reset_sort	Reset sort
 plugin_tracker_report	disable_multisort	Disable multisort
@@ -1306,6 +1310,7 @@ plugin_tracker_report	isobsolete_explanations	Report has been modified by <span 
 plugin_tracker_report	haschanged_isobsolete_explanations	Report has been modified by <span class="tracker_report_updated_by">$1</span>. You can either:
 plugin_tracker_report	renderer_name_mandatory	Renderer name is mandatory.
 plugin_tracker_report	set_default_report	Set default report
+plugin_tracker_report	search	Search
 
 plugin_tracker_report_widget	go_to_report	Go to report
 
@@ -1316,21 +1321,14 @@ plugin_tracker_stat	last_update	Last update
 plugin_tracker_stat	last_artifact_created	Last artifact created
 
 
-plugin_tracker_aggregate	AVG_sel	AVG - Average
-plugin_tracker_aggregate	AVG_title	Average:
-plugin_tracker_aggregate	COUNT_sel	COUNT - Count
-plugin_tracker_aggregate	COUNT_title	Count:
-plugin_tracker_aggregate	COUNT_GRBY_sel	COUNT GROUP BY - Count (group by)
-plugin_tracker_aggregate	COUNT_GRBY_title	Count (group by):
-plugin_tracker_aggregate	MAX_sel	MAX - Maximum
-plugin_tracker_aggregate	MAX_title	Maximum:
-plugin_tracker_aggregate	MIN_sel	MIN - Minimum
-plugin_tracker_aggregate	MIN_title	Minimum:
-plugin_tracker_aggregate	STD_sel	STD - Std deviation
-plugin_tracker_aggregate	STD_title	Std deviation:
-plugin_tracker_aggregate	SUM_sel	SUM - Sum
-plugin_tracker_aggregate	SUM_title	Sum:
-plugin_tracker_aggregate	toggle	-- Toggle an aggregate function
+plugin_tracker_aggregate	AVG	Average
+plugin_tracker_aggregate	COUNT	Count
+plugin_tracker_aggregate	COUNT_GRBY	Count (group by)
+plugin_tracker_aggregate	MAX	Maximum
+plugin_tracker_aggregate	MIN	Minimum
+plugin_tracker_aggregate	STD	Std deviation
+plugin_tracker_aggregate	SUM	Sum
+plugin_tracker_aggregate	toggle	Toggle an aggregate function
 
 
 plugin_tracker_search_index	artifact_title	Artifact Title

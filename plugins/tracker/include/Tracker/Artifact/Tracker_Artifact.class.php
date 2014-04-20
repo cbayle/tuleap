@@ -387,11 +387,10 @@ class Tracker_Artifact implements Recent_Element_Interface, Tracker_Dispatchable
      */
     public function fetchTitle($prefix = '') {
         $html = '';
-        $hp = Codendi_HTMLPurifier::instance();
         $html .= $this->fetchHiddenTrackerId();
         $html .= '<div class="tracker_artifact_title">';
         $html .= $prefix;
-        $html .= $hp->purify($this->getXRefAndTitle(), CODENDI_PURIFIER_CONVERT_HTML);
+        $html .= $this->getXRefAndTitle();
         $html .= '</div>';
         return $html;
     }
@@ -401,7 +400,12 @@ class Tracker_Artifact implements Recent_Element_Interface, Tracker_Dispatchable
     }
 
     public function getXRefAndTitle() {
-        return $this->getXRef() .' - '. $this->getTitle();
+        $hp = Codendi_HTMLPurifier::instance();
+        return '<span class="'. $this->getTracker()->getColor() .' xref-in-title">' .
+                $this->getXRef() .
+                '<span> - </span>'.
+                '</span>'.
+                $hp->purify($this->getTitle());
     }
     /**
      * Get the artifact title, or null if no title defined in semantics
@@ -602,12 +606,7 @@ class Tracker_Artifact implements Recent_Element_Interface, Tracker_Dispatchable
                 $GLOBALS['Response']->sendJSON($changeset_factory->getNewChangesetsFormattedForJson($this, $changeset_id));
                 break;
             case 'edit':
-                if ($request->isAjax()) {
-                    echo $this->fetchTooltip($current_user);
-                } else {
-                    $renderer = new Tracker_Artifact_EditRenderer($this->getEventManager(), $this, $this->getFormElementFactory(), $layout);
-                    $renderer->display($request, $current_user);
-                }
+                $GLOBALS['Response']->redirect($this->getUri());
                 break;
             case 'get-edit-in-place':
                 $renderer = new Tracker_Artifact_Renderer_EditInPlaceRenderer($this, $this->getMustacheRenderer());
@@ -685,8 +684,7 @@ class Tracker_Artifact implements Recent_Element_Interface, Tracker_Dispatchable
      * @return string html
      */
     public function fetchDirectLinkToArtifactWithTitle() {
-        $hp = Codendi_HTMLPurifier::instance();
-        return '<a class="direct-link-to-artifact" href="'. $this->getUri() . '">' . $hp->purify($this->getXRefAndTitle()) . '</a>';
+        return '<a class="direct-link-to-artifact" href="'. $this->getUri() . '">' . $this->getXRefAndTitle() . '</a>';
     }
 
     /**

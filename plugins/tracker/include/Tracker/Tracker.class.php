@@ -42,6 +42,7 @@ class Tracker implements Tracker_Dispatchable_Interface {
     public $group_id;
     public $name;
     public $description;
+    public $color;
     public $item_name;
     public $allow_copy;
     public $submit_instructions;
@@ -76,7 +77,8 @@ class Tracker implements Tracker_Dispatchable_Interface {
             $status,
             $deletion_date,
             $instantiate_for_new_projects,
-            $stop_notification) {
+            $stop_notification,
+            $color) {
         $this->id                           = $id;
         $this->group_id                     = $group_id;
         $this->name                         = $name;
@@ -89,8 +91,10 @@ class Tracker implements Tracker_Dispatchable_Interface {
         $this->deletion_date                = $deletion_date;
         $this->instantiate_for_new_projects = $instantiate_for_new_projects;
         $this->stop_notification            = $stop_notification;
+        $this->color                        = $color;
         $this->formElementFactory           = Tracker_FormElementFactory::instance();
         $this->sharedFormElementFactory     = new Tracker_SharedFormElementFactory($this->formElementFactory, new Tracker_FormElement_Field_List_BindFactory());
+        $this->renderer                     = TemplateRendererFactory::build()->getRenderer(TRACKER_TEMPLATE_DIR);
     }
     
     public function __toString() {
@@ -752,7 +756,7 @@ class Tracker implements Tracker_Dispatchable_Interface {
         $report = null;
 
         //Does the user wants to change its report?
-        if ($request->get('select_report') && $request->isPost()) {
+        if ($request->get('select_report')) {
             //Is the report id valid
             if ($report = $this->getReportFactory()->getReportById($request->get('select_report'), $current_user->getid())) {
                 $current_user->setPreference('tracker_'. $this->id .'_last_report', $report->id);
@@ -1246,62 +1250,22 @@ class Tracker implements Tracker_Dispatchable_Interface {
         $this->displayAdminHeader($layout, $title, $breadcrumbs);
         echo '<h2>'. $title .'</h2>';
     }
+
+    public function getColor() {
+        return $this->color;
+    }
+
     protected function displayAdminOptions(Tracker_IDisplayTrackerLayout $layout, $request, $current_user) {
-        $hp = Codendi_HTMLPurifier::instance();
         $this->displayAdminItemHeader($layout, 'editoptions');
-        $project = ProjectManager::instance()->getProject($this->group_id);
 
-        echo '<form name="form1" method="POST" action="'.TRACKER_BASE_URL.'/?tracker='. (int)$this->id .'&amp;func=admin-editoptions">
-          <input type="hidden" name="update" value="1">
-          <input type="hidden" name="instantiate_for_new_projects" value="0">
-          <table width="100%" border="0" cellpadding="5">
-            <tr> 
-              <td width="15%"><b>'.$GLOBALS['Language']->getText('plugin_tracker_include_artifact','name').'</b> <font color="red">*</font>:</td>
-              <td> 
-              <input type="text" name="name" value="'. $hp->purify($this->name, CODENDI_PURIFIER_CONVERT_HTML) .'">
-              </td>
-            </tr>
-            <tr> 
-              <td width="15%"><b>'.$GLOBALS['Language']->getText('plugin_tracker_include_artifact','desc').'</b>: <font color="red">*</font></td>
-              <td> 
-                <textarea name="description" rows="3" cols="50">'. $hp->purify($this->description, CODENDI_PURIFIER_CONVERT_HTML) .'</textarea>
-              </td>
-            </tr>
-            <tr> 
-              <td width="15%"><b>'.$GLOBALS['Language']->getText('plugin_tracker_include_type','short_name').'</b>: <font color="red">*</font></td>
-              <td> 
-                <input type="text" name="item_name" value="'. $hp->purify($this->item_name, CODENDI_PURIFIER_CONVERT_HTML) .'">
-              </td>
-            </tr>';
-        //<tr>
-        //  <td width="15%"><b>'.$GLOBALS['Language']->getText('plugin_tracker_include_type','allow_copy').'</b></td>
-        //  <td>
-        //    <input type="checkbox" name="allow_copy" value="1" '. ($this->allow_copy ? 'checked="checked"' : '') . '>
-        //  </td>
-        //</tr>';
-
-        echo '
-            <tr> 
-              <td width="15%"><b>'.$GLOBALS['Language']->getText('plugin_tracker_include_type','instantiate').':</b></td>
-              <td>
-                <input type="checkbox" name="instantiate_for_new_projects" value="1" '. ($this->instantiate_for_new_projects ? 'checked="checked"' : '') . '>
-              </td>
-            </tr>
-            <tr> 
-              <td width="15%">'.$GLOBALS['Language']->getText('plugin_tracker_include_type','submit_instr').'</td>
-              <td> 
-                <textarea name="submit_instructions" rows="3" cols="50">'. $hp->purify($this->submit_instructions, CODENDI_PURIFIER_CONVERT_HTML) .'</textarea>
-              </td>
-            </tr>
-            <tr> 
-              <td>'.$GLOBALS['Language']->getText('plugin_tracker_include_type','browse_instr').'</td>
-              <td> 
-                <textarea name="browse_instructions" rows="3" cols="50">'. $hp->purify($this->browse_instructions, CODENDI_PURIFIER_CONVERT_HTML) .'</textarea>
-              </td>
-            </tr>
-          </table>
-          <p align="center"><input type="submit" value="'.$GLOBALS['Language']->getText('global','btn_submit').'"></p>
-        </form>';
+        $this->renderer->renderToPage(
+            'tracker-general-settings',
+            new Tracker_GeneralSettings_Presenter(
+                $this,
+                TRACKER_BASE_URL.'/?tracker='. (int)$this->id .'&func=admin-editoptions',
+                new Tracker_ColorPresenterCollection($this)
+            )
+        );
 
         $this->displayFooter($layout);
     }
@@ -1682,7 +1646,7 @@ EOS;
         echo '<div class="tracker_confirm_delete">';
         echo '<form name="delete_artifact" method="post" action="'.TRACKER_BASE_URL.'/?tracker='. (int)$this->id.'&amp;func=admin-delete-artifact">';
         echo $token->fetchHTMLInput();
-        echo $GLOBALS['Language']->getText('plugin_tracker_admin', 'clean_confirm_text', array($artifact->getXRefAndTitle()), CODENDI_PURIFIER_DISABLED);
+        echo $GLOBALS['Language']->getText('plugin_tracker_admin', 'clean_confirm_text', array($artifact->getXRefAndTitle()));
         echo '<div class="tracker_confirm_delete_preview">';
         echo $this->fetchFormElementsReadOnly($artifact);
         echo '</div>';
@@ -1788,13 +1752,14 @@ EOS;
         $old_name = $this->getName();
         $this->name                         = trim($request->getValidated('name', 'string', ''));
         $this->description                  = trim($request->getValidated('description', 'text', ''));
+        $this->color                        = trim($request->getValidated('tracker_color', 'string', ''));
         $this->item_name                    = trim($request->getValidated('item_name', 'string', ''));
         $this->allow_copy                   = $request->getValidated('allow_copy') ? 1 : 0;
         $this->submit_instructions          = $request->getValidated('submit_instructions', 'text', '');
         $this->browse_instructions          = $request->getValidated('browse_instructions', 'text', '');
         $this->instantiate_for_new_projects = $request->getValidated('instantiate_for_new_projects') ? 1 : 0;
 
-        if (!$this->name || !$this->description || !$this->item_name) {
+        if (!$this->name || !$this->description || !$this->color || !$this->item_name) {
             $GLOBALS['Response']->addFeedback('error', $GLOBALS['Language']->getText('plugin_tracker_common_type','name_requ'));
         } else {
             if ($old_name != $this->name) {
@@ -2196,9 +2161,10 @@ EOS;
         }
 
         // these will not be used at the import
-        $xmlElem->addChild('name', $this->name);
-        $xmlElem->addChild('item_name', $this->item_name);
-        $xmlElem->addChild('description', $this->description);
+        $xmlElem->addChild('name', $this->getName());
+        $xmlElem->addChild('item_name', $this->getItemName());
+        $xmlElem->addChild('description', $this->getDescription());
+        $xmlElem->addChild('color', $this->getColor());
 
         // add only if not empty
         if ($this->submit_instructions) {
@@ -2841,6 +2807,7 @@ EOS;
     }
 
     protected $cache_stats;
+
     /**
      * get stats for this tracker
      *

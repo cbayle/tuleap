@@ -5,13 +5,15 @@ codendi.locales['tracker_formelement_admin'] = {
     cancel: 'cancel',
     add_another_file: 'Add another file',
     unique_field: 'This field type cannot be added twice on a same tracker',
-    lose_follows: 'Your follow-up comment will be lost. Do you want to continue?'
+    lose_follows: 'There are changes that have not been saved. Do you want to continue?'
 };
 codendi.locales['tracker_artifact'] = {
     masschange: 'Masschange',
     masschange_check_all: 'Check all',
     masschange_uncheck_all: 'Uncheck all',
-    display_changes: 'Display changes'
+    display_settings: 'Display settings',
+    display_changes: 'Changes are displayed',
+    reverse_order: 'Comments are in reversed order'
 };
 codendi.locales['tracker_renderer'] = {
     order_dragdrop: 'You can order tabs with drag \'n drop'

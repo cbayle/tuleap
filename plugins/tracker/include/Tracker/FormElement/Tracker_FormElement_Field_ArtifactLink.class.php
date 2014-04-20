@@ -191,10 +191,9 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         $prefill_parent = '';
         $name           = 'artifact['. $this->id .']';
         $current_user   = $this->getCurrentUser();
-        $hp             = Codendi_HTMLPurifier::instance();
         $can_create     = false;
 
-        return $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $hp, $can_create);
+        return $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $can_create);
     }
 
     public function fetchSubmitForOverlay($submitted_values) {
@@ -202,7 +201,6 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         $name           = 'artifact['. $this->id .']';
         $parent_tracker = $this->getTracker()->getParent();
         $current_user   = $this->getCurrentUser();
-        $hp             = Codendi_HTMLPurifier::instance();
         $can_create     = false;
 
         if (! $parent_tracker) {
@@ -213,7 +211,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
             return '';
         }
 
-        return $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $hp, $can_create);
+        return $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $can_create);
     }
 
     private function getArtifactLinkIdsOfLastChangeset(Tracker_Artifact $artifact = null) {
@@ -347,7 +345,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         return new Tracker_Report_Criteria_ArtifactLink_ValueDao();
     }
 
-    private function fetchParentSelector($prefill_parent, $name, Tracker $parent_tracker, PFUser $user, Codendi_HTMLPurifier $hp, $can_create) {
+    private function fetchParentSelector($prefill_parent, $name, Tracker $parent_tracker, PFUser $user, $can_create) {
         $html  = '';
         $html .= '<p>';
         list($label, $possible_parents, $display_selector) = $this->getPossibleArtifactParents($parent_tracker, $user);
@@ -359,7 +357,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
             if ($can_create) {
                 $html .= '<option value="'.self::CREATE_NEW_PARENT_VALUE.'">'. $GLOBALS['Language']->getText('plugin_tracker_artifact', 'formelement_artifactlink_create_new_parent') .'</option>';
             }
-            $html .= $this->fetchArtifactParentsOptions($prefill_parent, $label, $possible_parents, $hp);
+            $html .= $this->fetchArtifactParentsOptions($prefill_parent, $label, $possible_parents);
             $html .= '</select>';
             $html .= '</label>';
         } elseif ($possible_parents) {
@@ -369,7 +367,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         return $html;
     }
 
-    private function fetchArtifactParentsOptions($prefill_parent, $label, array $possible_parents, Codendi_HTMLPurifier $hp) {
+    private function fetchArtifactParentsOptions($prefill_parent, $label, array $possible_parents) {
         $html  = '';
         if ($possible_parents) {
             $html .= '<optgroup label="'. $label .'">';
@@ -378,7 +376,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
                 if ($possible_parent->getId() == $prefill_parent) {
                     $selected = ' selected="selected"';
                 }
-                $html .= '<option value="'. $possible_parent->getId() .'"'.$selected.'>'. $hp->purify($possible_parent->getXRefAndTitle()) .'</option>';
+                $html .= '<option value="'. $possible_parent->getId() .'"'.$selected.'>'. $possible_parent->getXRefAndTitle() .'</option>';
             }
             $html .= '</optgroup>';
         }
@@ -431,11 +429,14 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         $reverse_artifact_links = false
     ) {
         $current_user = $this->getCurrentUser();
-        $html         = '';
+        $html = '';
 
         if ($reverse_artifact_links) {
-            $html .= '<button class="btn" id="display-tracker-form-element-artifactlink-reverse">' . $GLOBALS['Language']->getText('plugin_tracker_artifact', 'formelement_artifactlink_display_reverse') . '</button>';
+            $html .= '<div class="artifact-link-value-reverse">';
+            $html .= '<a href="" class="btn" id="display-tracker-form-element-artifactlink-reverse">' . $GLOBALS['Language']->getText('plugin_tracker_artifact', 'formelement_artifactlink_display_reverse') . '</a>';
             $html .= '<div id="tracker-form-element-artifactlink-reverse" style="display: none">';
+        } else {
+            $html .= '<div class="artifact-link-value">';
         }
 
         $html .= '<h5 class="artifack_link_subtitle">'.$this->getWidgetTitle($reverse_artifact_links).'</h5>';
@@ -465,7 +466,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
             $is_submit      = $artifact->getId() == -1;
             if ($parent_tracker && $is_submit) {
                 $can_create   = true;
-                $html .= $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $hp, $can_create);
+                $html .= $this->fetchParentSelector($prefill_parent, $name, $parent_tracker, $current_user, $can_create);
             }
         }
 
@@ -555,6 +556,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         if ($reverse_artifact_links) {
             $html .= '</div>';
         }
+        $html .= '</div>';
 
         return $html;
     }
@@ -754,7 +756,7 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
             $artifact_links = $value->getValue();
         }
 
-        if (isset($submitted_values[0]) && is_array($submitted_values[0])) {
+        if (! empty($submitted_values) && isset($submitted_values[0]) && is_array($submitted_values[0])) {
             $submitted_value = $submitted_values[0][$this->getId()];
         }
 
@@ -814,6 +816,14 @@ class Tracker_FormElement_Field_ArtifactLink extends Tracker_FormElement_Field {
         $reverse_links_tab   = $this->fetchReverseLinks($artifact);
 
         return $links_tab_read_only . $reverse_links_tab;
+    }
+
+    public function fetchArtifactValueWithEditionFormIfEditable(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null) {
+        return $this->getHiddenArtifactValueForEdition($artifact, $value) . $this->fetchArtifactValueReadOnly($artifact, $value) ;
+    }
+
+    public function getHiddenArtifactValueForEdition(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null) {
+        return "<div class='tracker_hidden_edition_field' data-field-id=" . $this->getId() . ">" . $this->fetchLinks($artifact, $value) . "</div>";
     }
 
     private function fetchLinksReadOnly(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null) {

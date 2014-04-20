@@ -91,15 +91,7 @@ abstract class Tracker_Artifact_ArtifactRenderer {
      * @return string The HTML code for artifact fields
      */
     public function fetchFields(Tracker_Artifact $artifact, $submitted_values = array()) {
-        return '<div class="tabForStory1693" id="fieldsFetchedChangeMe">
-            <table cellspacing="0" cellpadding="0" border="0">
-                <tr valign="top">
-                    <td style="padding-right:1em;">'.
-                        $artifact->getTracker()->fetchFormElements($artifact, array($submitted_values)).
-                    '</td>
-                </tr>
-            </table>
-        </div>';
+        return $artifact->getTracker()->fetchFormElements($artifact, array($submitted_values));
     }
 
     /**
@@ -108,11 +100,18 @@ abstract class Tracker_Artifact_ArtifactRenderer {
      * @return string The HTML code for submit buttons
      */
     public function fetchSubmitButton() {
-        return '<p class="artifact-submit-button">
-                  <input class="btn btn-primary" type="submit" value="'. $GLOBALS['Language']->getText('global', 'btn_submit') .'" />
-                  <input class="btn btn-primary" type="submit" name="submit_and_stay" value="'. $GLOBALS['Language']->getText('global', 'btn_submit_and_stay') .'" />
-                  '. $this->getConcurrentEditMessage() .'
-                </p>';
+        return '<div class="hidden-artifact-submit-button">
+                    <input type="hidden" id="submit-type" />
+                    <div class="btn-group dropup">
+                        <button class="btn btn-large btn-primary" type="submit">'. $GLOBALS['Language']->getText('global', 'btn_submit') .'</button>
+                        <button class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><input type="submit" name="submit_and_stay" class="btn btn-link" value="'.$GLOBALS['Language']->getText('global', 'btn_submit_and_stay').'" /></li>
+                        </ul>
+                    </div>'.$this->getConcurrentEditMessage().'
+                </div>';
     }
 
     protected function getConcurrentEditMessage() {

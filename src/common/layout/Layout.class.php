@@ -1416,7 +1416,7 @@ class Layout extends Response {
      *
      * @return string The calendar picker
      */
-    public function getBootstrapDatePicker($id, $name, $value, array $criteria_selector, $classes=array()) {
+    public function getBootstrapDatePicker($id, $name, $value, array $criteria_selector, array $classes) {
         $hp = Codendi_HTMLPurifier::instance();
         $html  = '';
         $html .= '<div class="input-prepend dropdown input-append date ' . implode(' ', $classes) . '">';
@@ -1431,16 +1431,16 @@ class Layout extends Response {
         }
 
         $html .= '
-            <span>
-            <input name="'. $hp->purify($name, CODENDI_PURIFIER_CONVERT_HTML) .'"
-                   id="'. $hp->purify($id, CODENDI_PURIFIER_CONVERT_HTML) .'"
-                   data-format="yyyy-MM-dd"
-                   type="text"
-                   value="' . $hp->purify($value, CODENDI_PURIFIER_CONVERT_HTML) . '">
-            </input>
-            <span class="add-on add-on-calendar">
-              <i class="icon-calendar" data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-            </span>
+            <span class="tuleap_field_date">
+                <input name="'. $hp->purify($name, CODENDI_PURIFIER_CONVERT_HTML) .'"
+                       id="'. $hp->purify($id, CODENDI_PURIFIER_CONVERT_HTML) .'"
+                       data-format="yyyy-MM-dd"
+                       type="text"
+                       value="' . $hp->purify($value, CODENDI_PURIFIER_CONVERT_HTML) . '">
+                </input>
+                <span class="add-on add-on-calendar">
+                  <i class="icon-calendar" data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                </span>
             </span>
         </div>';
 

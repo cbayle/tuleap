@@ -1,3 +1,4 @@
+<?php
 /**
  * Copyright (c) Enalean, 2014. All Rights Reserved.
  *
@@ -17,27 +18,24 @@
  * along with Tuleap. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var tuleap = tuleap || { };
-tuleap.tracker = tuleap.tracker || { };
+class b201404161017_add_color_column_to_tracker extends ForgeUpgrade_Bucket {
 
-(function ($) {
-    tuleap.tracker.dateTimePicker = {
+    public function description() {
+        return 'Add color column to tracker table';
+    }
 
-        init: function(selector) {
+    public function preUp() {
+        $this->db = $this->getApi('ForgeUpgrade_Bucket_Db');
+    }
 
-         $(selector).datetimepicker({
-             language: codendi.locale,
-             pickTime: false
-             });
+    public function up() {
+        $sql = "ALTER TABLE tracker ADD COLUMN color varchar(64) NOT NULL DEFAULT 'inca_silver'";
+
+        $result = $this->db->dbh->exec($sql);
+
+        if ($result === false) {
+            $error_message = implode(', ', $this->db->dbh->errorInfo());
+            throw new ForgeUpgrade_Bucket_Exception_UpgradeNotComplete($error_message);
         }
-    };
-
-    $(document).ready(function () {
-        if ($('#tracker_report_form').size() > 0) {
-            tuleap.tracker.dateTimePicker.init('.tracker_artifact_field_date > span');
-            return;
-        }
-        tuleap.tracker.dateTimePicker.init('.tracker_artifact_field_date');
-    });
-
-})(window.jQuery);
+    }
+}

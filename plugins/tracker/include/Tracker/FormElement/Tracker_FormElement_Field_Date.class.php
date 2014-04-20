@@ -394,12 +394,27 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
         $criteria_value = $this->getCriteriaValue($criteria);
         $html .= '<div style="text-align:right">';
         $value = isset($criteria_value['from_date']) ? $this->formatDate($criteria_value['from_date']) : '';
-        $html .= $GLOBALS['Language']->getText('plugin_tracker_include_field','start');
-        $html .= $GLOBALS['HTML']->getDatePicker("criteria_".$this->id ."_from", "criteria[". $this->id ."][from_date]", $value);
-        $html .= "<br />";
+        $html .= '<label>';
+        $html .= $GLOBALS['Language']->getText('plugin_tracker_include_field','start').' ';
+        $html .= $GLOBALS['HTML']->getBootstrapDatePicker(
+            "criteria_".$this->id ."_from",
+            "criteria[". $this->id ."][from_date]",
+            $value,
+            array(),
+            array()
+        );
+        $html .= '</label>';
         $value = isset($criteria_value['to_date']) ? $this->formatDate($criteria_value['to_date']) : '';
-        $html .= $GLOBALS['Language']->getText('plugin_tracker_include_field','end');
-        $html .= $GLOBALS['HTML']->getDatePicker("criteria_".$this->id ."_to", "criteria[". $this->id ."][to_date]", $value);
+        $html .= '<label>';
+        $html .= $GLOBALS['Language']->getText('plugin_tracker_include_field','end').' ';
+        $html .= $GLOBALS['HTML']->getBootstrapDatePicker(
+            "criteria_".$this->id ."_to",
+            "criteria[". $this->id ."][to_date]",
+            $value,
+            array(),
+            array()
+        );
+        $html .= '</label>';
         $html .= '</div>';
         return $html;
     }
@@ -453,9 +468,7 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
                 "criteria[". $this->id ."][to_date]",
                 $value,
                 $criteria_selector,
-                array(
-                    "tracker_artifact_field_date"
-                )
+                array()
             );
             $html .= '</div>';
         }
@@ -584,7 +597,8 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
      * @return string
      */
     protected function fetchArtifactValue(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null, $submitted_values = array()) {
-        if (is_array($submitted_values[0])) {
+        $html = '';
+        if (! empty($submitted_values) && is_array($submitted_values[0])) {
             $value=$submitted_values[0][$this->getId()];
         } else {
             if ($value != null) {
@@ -593,17 +607,12 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
             }
         }
 
-        $date_picker_classes = array("tracker_artifact_field_date");
-        if ($this->has_errors) {
-            $date_picker_classes[] = 'has_error';
-        }
-
         return $GLOBALS['HTML']->getBootstrapDatePicker(
             "tracker_admin_field_".$this->id,
             'artifact['.$this->id.']',
             $value,
             array(),
-            $date_picker_classes
+            $this->has_errors ? array('has_error') : array()
         );
     }
 
@@ -637,10 +646,14 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
         if ( empty($value) || ! $value->getTimestamp() ) {
             return $this->getNoValueLabel();
         }
-        $value = $value->getTimestamp();
-        $value = $value ? $this->formatDate($value) : '';
-        $html .= $value;
+        $value_timestamp = $value->getTimestamp();
+        $value_timestamp = $value_timestamp ? $this->formatDate($value_timestamp) : '';
+        $html .= $value_timestamp;
         return $html;
+    }
+
+    public function fetchArtifactValueWithEditionFormIfEditable(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null) {
+        return $this->fetchArtifactValueReadOnly($artifact, $value) . $this->getHiddenArtifactValueForEdition($artifact, $value);
     }
     
     /**
@@ -671,7 +684,7 @@ class Tracker_FormElement_Field_Date extends Tracker_FormElement_Field {
             '',
             $this->hasDefaultValue() ? $this->getDefaultValue() : '',
             array(),
-            array("tracker_artifact_field_date")
+            array()
         );
     }
 

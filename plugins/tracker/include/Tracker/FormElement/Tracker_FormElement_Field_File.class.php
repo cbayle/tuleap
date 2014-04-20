@@ -212,6 +212,9 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
         return $html;
     }
 
+    public function fetchArtifactValueWithEditionFormIfEditable(Tracker_Artifact $artifact, Tracker_Artifact_ChangesetValue $value = null) {
+        return $this->fetchArtifactValueReadOnly($artifact, $value) . $this->getHiddenArtifactValueForEdition($artifact, $value);
+    }
     /**
      * Fetch the html code to display the field value in new artifact submission form
      *
@@ -219,13 +222,16 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
      */
     protected function fetchSubmitValue() {
         $html = '';
-        $html .= '<div class="tracker_artifact_attachment">';
-        $html .= '<p>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file').'</p>';
-        $html .= '<table class="tracker_artifact_add_attachment">';
-        $html .= '<tr><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_description').'</label></td><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_file').'</label></td></tr>';
-        $html .= '<tr><td><input type="text" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][description]" /></td>';
-        $html .= '<td><input type="file" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][file]" /></td></tr>';
-        $html .= '</table>';
+        $html .= '<div class="add-attachement">';
+        $html .= '<p>'. $GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file') .'</p>';
+        $html .= '<div class="tracker_artifact_add_attachment">';
+        $html .= '<p>';
+        $html .= '<input type="file" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][file]" />';
+        $html .= '<label>'. $GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_description');
+        $html .= '</label>';
+        $html .= ' <input type="text" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][description]" />';
+        $html .= '</p>';
+        $html .= '</div>';
         $html .= '</div>';
         return $html;
     }
@@ -237,18 +243,8 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
      */
     protected function fetchSubmitValueMasschange() {
         return '';  // deactivate mass change for file fields (see issue described in rev #15855)
-
-        $html = '';
-        $html .= '<div class="tracker_artifact_attachment">';
-        $html .= '<p>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file').'</p>';
-        $html .= '<table class="tracker_artifact_add_attachment">';
-        $html .= '<tr><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_description').'</label></td><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_file').'</label></td></tr>';
-        $html .= '<tr><td><input type="text" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][description]" /></td>';
-        $html .= '<td><input type="file" id="tracker_field_'. $this->id .'" name="artifact['. $this->id .'][][file]" /></td></tr>';
-        $html .= '</table>';
-        $html .= '</div>';
-        return $html;
     }
+
     /**
      * Fetch the changes that has been made to this field in a followup
      *
@@ -290,26 +286,30 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
                     )
                 );
                 $sanitized_description = $hp->purify($fileinfo->getDescription(), CODENDI_PURIFIER_CONVERT_HTML);
+
                 $link_show = '<a href="'.TRACKER_BASE_URL.'/?'. $query_link .'"
                                  '. ($fileinfo->isImage() ? 'rel="lytebox['. $this->getId() .']" ' : '') .'
                                  '. ($fileinfo->isImage() ? 'style="cursor:-moz-zoom-in;" '        : '') .'
                                  title="'. $sanitized_description .'">';
 
-                $info = $link_show . $hp->purify($fileinfo->getFilename(), CODENDI_PURIFIER_CONVERT_HTML) .'</a>';
-                $info .= ' ('. $fileinfo->getHumanReadableFilesize() .')';
-                if ($sanitized_description) {
-                    $info .= '<div class="tracker_artifact_attachment_description">' . $sanitized_description . '</div>';
-                }
-                if ($submitter_needed) {
-                    $info .= '<div class="tracker_artifact_attachment_submitter">'. 'By '. $uh->getLinkOnUserFromUserId($fileinfo->getSubmittedBy()) .'</div>';
-                }
 
                 $add = '<div class="tracker_artifact_attachment">';
-                $add .= '<table><tr><td>';
                 if (!$read_only) {
                     $add .= $this->fetchDeleteCheckbox($fileinfo, $submitted_values);
-                    $add .= '</td><td>';
                 }
+
+
+                $add .= '<div class="tracker_artifact_preview_attachment_hover">';
+                if ($submitter_needed) {
+                    $add .= '<div class="tracker_artifact_attachment_submitter">'. 'By '. $uh->getLinkOnUserFromUserId($fileinfo->getSubmittedBy()) .'</div>';
+                }
+                $add .= '<div class="tracker_artifact_attachment_size">('. $fileinfo->getHumanReadableFilesize() .')</div>';
+                $add .= '<div>';
+                $add .= $link_show . '<i class="icon-eye-open"></i></a>';
+                $add .= '<a href="'.TRACKER_BASE_URL.'/?'. $query_link .'" download><i class="icon-download-alt"></i></a>';
+                $add .= '</div>';
+                $add .= '</div>';
+
                 if ($fileinfo->isImage()) {
                     $query_add = http_build_query(
                         array(
@@ -319,24 +319,30 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
                             'attachment' => $fileinfo->getId()
                         )
                     );
-                    $add .= $link_show;
-                    $add .= '<span class="tracker_artifact_preview_attachment">';
-                    $add .= '<img src="'.TRACKER_BASE_URL.'/?'. $query_add .'"
-                                  alt="'. $sanitized_description .'"
-                                  style="vertical-align:middle;" />';
-                    $add .= '</span> ';
-                    $add .= '</a>';
-                    $add .= '</td><td>';
+
+                    $add .= '<div class="tracker_artifact_preview_attachment image">';
+                    $add .= '<div style="background-image: url(\''.TRACKER_BASE_URL.'/?'. $query_add .'\')"></div>';
+                    $add .= '</div>';
+                } else {
+                    $add .= '<div class="tracker_artifact_preview_attachment"></div>';
                 }
-                $add .= $info;
-                $add .= '</td></tr></table>';
+
+                $add .= '<div class="tracker_artifact_attachment_name">' . $link_show . $hp->purify($fileinfo->getFilename(), CODENDI_PURIFIER_CONVERT_HTML) .'</a></div>';
+
+                if ($sanitized_description) {
+                    $add .= '<div class="tracker_artifact_attachment_description">' . $sanitized_description . '</div>';
+                }
+
                 $add .= '</div>';
                 $added[] = $add;
             }
             $html .= implode('', $added);
-        } else {
+        }
+
+        if ($read_only && ! count($values)) {
             $html .= $this->getNoValueLabel();
         }
+
         return $html;
     }
 
@@ -500,7 +506,7 @@ class Tracker_FormElement_Field_File extends Tracker_FormElement_Field {
      */
     protected function fetchAdminFormElement() {
         $html = '';
-        $html .= '<div class="tracker_artifact_attachment">';
+        $html .= '<div>';
         $html .= '<p>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file').'</p>';
         $html .= '<table class="tracker_artifact_add_attachment">';
         $html .= '<tr><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_description').'</label></td><td><label>'.$GLOBALS['Language']->getText('plugin_tracker_formelement_admin','add_new_file_file').'</label></td></tr>';

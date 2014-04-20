@@ -5,13 +5,15 @@ codendi.locales['tracker_formelement_admin'] = {
     cancel: 'annuler',
     add_another_file: 'Ajouter un autre fichier',
     unique_field: 'Ce type de champ ne peut être présent qu\'une fois par tracker.',
-    lose_follows: 'Votre commentaire sera perdu. Voulez-vous continuer ?'
+    lose_follows: 'Des changements ont été effectués mais n\'ont pas été sauvegardés. Voulez-vous continuer ?'
 };
 codendi.locales['tracker_artifact'] = {
     masschange: 'Mise à jour massive',
     masschange_check_all: 'Tout cocher',
     masschange_uncheck_all: 'Décocher tout',
-    display_changes: 'Afficher les changements'
+    display_settings: 'Paramètres d\'affichage',
+    display_changes: 'Les changements sont affichés',
+    reverse_order: 'L\'ordre des commentaires est inversé'
 };
 codendi.locales['tracker_renderer'] = {
     order_dragdrop: 'Vous pouvez ordonner les onglets avec le glisser/déposer'

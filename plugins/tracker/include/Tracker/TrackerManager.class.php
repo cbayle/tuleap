@@ -552,8 +552,9 @@ class TrackerManager implements Tracker_IFetchTrackerSwitcher {
                         $html .= $GLOBALS['HTML']->getImage('ic/bin_closed.png', array('alt' => 'delete'));
                         $html .= '</a></div>';
                     }
+                    $html .= '<div class="tracker_homepage_info">';
                     $html .= '<a class="direct-link-to-tracker" href="'.TRACKER_BASE_URL.'/?tracker='. $tracker->id .'">';
-                    $html .= $GLOBALS['HTML']->getImage('ic/clipboard-list.png', array('border' => 0, 'alt' => '', 'style="vertical-align:top;"')) .' ';
+                    $html .= '<i class="icon-circle tracker_color_info '. $tracker->getColor() .'"></i>';
                     $html .= $hp->purify($tracker->name, CODENDI_PURIFIER_CONVERT_HTML);
                     $html .= '</a>';
                     
@@ -577,6 +578,7 @@ class TrackerManager implements Tracker_IFetchTrackerSwitcher {
                         $html .= '</dd>';
                     }
                         
+                    $html .= '</div>';
 
                 }
             }
