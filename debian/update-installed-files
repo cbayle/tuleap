@@ -31,8 +31,6 @@ update_parameter codendi_shell_skel /etc/tuleap_skel
 perl -pi -e "s|codendiadm|www-data|g" debian/tuleap/usr/share/tuleap/src/utils/cron.d/codendi
 perl -pi -e "s|tmpwatch|tmpreaper|g" debian/tuleap/usr/share/tuleap/src/utils/cron.d/codendi
 
-perl -pi -e "s|/usr/share/ckeditor|/usr/share/javascript/ckeditor|g" debian/tuleap/usr/share/tuleap/src/etc/ckeditor.conf.dist
-
 find debian/tuleap-plugin-mediawiki -type l | while read link
 do
 	name=`basename $link`
