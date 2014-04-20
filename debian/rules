@@ -6,6 +6,10 @@ APP_DIR = debian/tuleap/usr/share/tuleap
 	dh $@
 
 override_dh_install:
+	# Make doc
+	make doc 
+	# Make less
+	make less
 	# Copy files for main tuleap package
 	dh_install -ptuleap -Xsrc/www/themes -XCORE_MAILMAN_VERSION -XCORE_SUBVERSION_VERSION -XCORE_CVS_VERSION -XLICENSE -XCOPYING -XLICENCE -Xlicense.txt
 	mkdir -p $(APP_DIR)/src/www/themes
@@ -25,11 +29,6 @@ override_dh_install:
 	# Update default configuration and other files for debian-specific
 	# changes
 	debian/update-installed-files
-	# Make doc
-	make doc 
-	# Make less
-	make less
-
 
 override_dh_fixperms:
 	dh_fixperms
