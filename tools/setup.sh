@@ -698,6 +698,7 @@ setup_apache_debian() {
     a2enmod mime
     a2enmod deflate
     a2enmod vhost_alias
+    a2enmod expires
 
     install_dist_conf /etc/apache2/sites-available/tuleap
     mkdir -p /etc/apache2/tuleap
