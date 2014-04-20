@@ -511,12 +511,18 @@ setup_mysql() {
     pass_opt=""
     if [ -z "$mysql_remote_server" ]; then
         # See if MySQL root account is password protected
-        $MYSQLSHOW -u$mysql_user 2>&1 | grep password
-        while [ $? -eq 0 ]; do
-            read -s -p "Existing DB is password protected. What is the Mysql $mysql_user password?: " old_passwd
-            echo
-            $MYSQLSHOW -u$mysql_user --password=$old_passwd 2>&1 | grep password
-        done
+        if [ -z "$rt_passwd" ]
+        then
+                $MYSQLSHOW -uroot 2>&1 | grep password
+                while [ $? -eq 0 ]; do
+                        read -s -p "Existing DB is password protected. What is the Mysql root password?: " old_passwd
+                        echo
+                        $MYSQLSHOW -uroot --password=$old_passwd 2>&1 | grep password
+                done
+        else
+                old_passwd="$rt_passwd"
+        fi
+	#don't try to check if db has no passwd when passwd is given
         if [ "X$old_passwd" != "X" ]; then
             pass_opt="-u$mysql_user --password=$old_passwd"
         else
