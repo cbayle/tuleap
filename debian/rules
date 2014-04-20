@@ -10,6 +10,8 @@ override_dh_install:
 	make doc 
 	# Make less
 	make less
+	# Patch ckeditor path
+	perl -pi -e "s|/usr/share/ckeditor|/usr/share/javascript/ckeditor|g" src/etc/ckeditor.conf.dist
 	# Copy files for main tuleap package
 	dh_install -ptuleap -Xsrc/www/themes -XCORE_MAILMAN_VERSION -XCORE_SUBVERSION_VERSION -XCORE_CVS_VERSION -XLICENSE -XCOPYING -XLICENCE -Xlicense.txt
 	mkdir -p $(APP_DIR)/src/www/themes
